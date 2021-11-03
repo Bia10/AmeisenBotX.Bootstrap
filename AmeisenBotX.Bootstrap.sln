@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmeisenBotX.Bootstrap", "AmeisenBotX.Bootstrap\AmeisenBotX.Bootstrap.csproj", "{CFA59075-D7A6-4277-B64C-751823F5502B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFA59075-D7A6-4277-B64C-751823F5502B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFA59075-D7A6-4277-B64C-751823F5502B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFA59075-D7A6-4277-B64C-751823F5502B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFA59075-D7A6-4277-B64C-751823F5502B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA393A8C-8E54-449A-A1AE-0F826E4ABBBD}
+	EndGlobalSection
+EndGlobal
