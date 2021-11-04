@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -8,23 +9,33 @@ namespace AmeisenBotX.Bootstrap
     {
         private static void Main(string[] args)
         {
-            const string trinityBuildPath = "C:\\Build\\bin\\RelWithDebInfo\\";
-            LaunchTrinity(trinityBuildPath);
+            const string trinityBuildPath = "C:\\Build\\bin\\RelWithDebInfo";
+            
+            LaunchAuthServer(trinityBuildPath);
+            LaunchWorldServer(trinityBuildPath);
         }
 
-        private static void LaunchTrinity(string trinityBuildPath)
+
+        private static void LaunchAuthServer(string trinityBuildPath)
         {
-            var authServerPath = trinityBuildPath + "authserver.exe";
-            var worldServerPath = trinityBuildPath + "worldserver.exe";
+            var authServerPath = trinityBuildPath + "\\authserver.exe";
 
             if (File.Exists(authServerPath))
             {
                 Console.WriteLine("Launching auth server!");
 
-                var launcher = new Launcher(authServerPath, string.Empty, trinityBuildPath);
-                launcher.Launch();
+                foreach(var process in Process.GetProcesses())
+                {
+                    if (process.ProcessName != "authserver") continue;
+                    Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
+                    return;
+                    // process.Kill();
+                }
 
-                if (launcher.ErrorOutput.Any())
+                var authLauncher = new Launcher(authServerPath, string.Empty, trinityBuildPath);
+                authLauncher.Launch();
+
+                if (authLauncher.ErrorOutput.Any())
                     throw new Exception("Errors occurred during launch of authserver.exe!");
 
                 Console.WriteLine("Auth server ready!");
@@ -33,15 +44,28 @@ namespace AmeisenBotX.Bootstrap
             {
                 throw new FileNotFoundException($"Failed to find authserver.exe! at path: {authServerPath}");
             }
+        }
+
+        private static void LaunchWorldServer(string trinityBuildPath)
+        {
+            var worldServerPath = trinityBuildPath + "\\worldserver.exe";
 
             if (File.Exists(worldServerPath))
             {
                 Console.WriteLine("Launching world server!");
 
-                var launcher = new Launcher(worldServerPath, string.Empty, trinityBuildPath);
-                launcher.Launch();
+                foreach(var process in Process.GetProcesses())
+                {
+                    if (process.ProcessName != "worldserver") continue;
+                    Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
+                    return;
+                   // process.Kill();
+                }
 
-                if (launcher.ErrorOutput.Any())
+                var worldLauncher = new Launcher(worldServerPath, string.Empty, trinityBuildPath);
+                worldLauncher.Launch();
+
+                if (worldLauncher.ErrorOutput.Any())
                     throw new Exception("Errors occurred during launch of authserver.exe!");
 
                 Console.WriteLine("World server ready!");
