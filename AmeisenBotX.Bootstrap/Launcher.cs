@@ -92,7 +92,9 @@ namespace AmeisenBotX.Bootstrap
                     curProcess.BeginErrorReadLine();
                 }
 
-                Console.WriteLine(curProcess.Responding ? "Status = Running" : "Status = Not Responding");
+                Console.WriteLine(curProcess.Responding 
+                    ? $"{curProcess.ProcessName}({curProcess.Id}) Status = Responding"
+                    : $"{curProcess.ProcessName}({curProcess.Id}) Status = Not Responding");
             }
             catch (Exception ex)
             {
@@ -112,8 +114,8 @@ namespace AmeisenBotX.Bootstrap
 
         private enum ExitCode
         {
-            normalTermination = 0,
-            abnormalTermination,
+            NormalTermination = 0,
+            AbnormalTermination,
         }
 
         private static void ExitedHandler(object sendingProcess, EventArgs e)
