@@ -13,24 +13,24 @@ namespace AmeisenBotX.Bootstrap
             
             LaunchAuthServer(trinityBuildPath);
             LaunchWorldServer(trinityBuildPath);
+            //
         }
-
 
         private static void LaunchAuthServer(string trinityBuildPath)
         {
+            foreach(var process in Process.GetProcesses())
+            {
+                if (process.ProcessName != "authserver") continue;
+                Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
+                return;
+                // process.Kill();
+            }
+
             var authServerPath = trinityBuildPath + "\\authserver.exe";
 
             if (File.Exists(authServerPath))
             {
                 Console.WriteLine("Launching auth server!");
-
-                foreach(var process in Process.GetProcesses())
-                {
-                    if (process.ProcessName != "authserver") continue;
-                    Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
-                    return;
-                    // process.Kill();
-                }
 
                 var authLauncher = new Launcher(authServerPath, string.Empty, trinityBuildPath);
                 authLauncher.Launch();
@@ -50,17 +50,17 @@ namespace AmeisenBotX.Bootstrap
         {
             var worldServerPath = trinityBuildPath + "\\worldserver.exe";
 
+            foreach(var process in Process.GetProcesses())
+            {
+                if (process.ProcessName != "worldserver") continue;
+                Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
+                return;
+                // process.Kill();
+            }
+
             if (File.Exists(worldServerPath))
             {
                 Console.WriteLine("Launching world server!");
-
-                foreach(var process in Process.GetProcesses())
-                {
-                    if (process.ProcessName != "worldserver") continue;
-                    Console.WriteLine("Already running! Process: {0} ID: {1}", process.ProcessName, process.Id);
-                    return;
-                   // process.Kill();
-                }
 
                 var worldLauncher = new Launcher(worldServerPath, string.Empty, trinityBuildPath);
                 worldLauncher.Launch();

@@ -61,7 +61,6 @@ namespace AmeisenBotX.Bootstrap
                     FileName = _exePath,
                     Arguments = _cmdArgs,
                     WorkingDirectory = workDirPath,
-                    WindowStyle = ProcessWindowStyle.Normal,
                     CreateNoWindow = true,
                     ErrorDialog = false,
                     UseShellExecute = false,
@@ -84,19 +83,16 @@ namespace AmeisenBotX.Bootstrap
                     curProcess.Exited += ExitedHandler;
                 }
 
-                if (curProcess.Start() && curProcess.HasExited)
-                    throw new Exception($"Start() returned HasExited = true after starting. ExitCode: {curProcess.ExitCode}");
+                if (!curProcess.Start())
+                    throw new Exception($"Failed to start process. ExitCode: {curProcess.ExitCode}");
 
-                if (curProcess.Start())
+                if (curProcess.StartInfo.UseShellExecute == false)
                 {
-                    if (curProcess.StartInfo.UseShellExecute == false)
-                    {
-                        curProcess.BeginOutputReadLine();
-                        curProcess.BeginErrorReadLine();
-                    }
-
-                    Console.WriteLine(curProcess.Responding ? "Status = Running" : "Status = Not Responding");
+                    curProcess.BeginOutputReadLine();
+                    curProcess.BeginErrorReadLine();
                 }
+
+                Console.WriteLine(curProcess.Responding ? "Status = Running" : "Status = Not Responding");
             }
             catch (Exception ex)
             {
@@ -125,8 +121,9 @@ namespace AmeisenBotX.Bootstrap
             var proc = (Process)sendingProcess;
             Finished = true;
 
-            Console.WriteLine($"Exit time: {proc.ExitTime}\n" + $"Exit code: {(ExitCode)proc.ExitCode}\n" +
-                              $"Elapsed time: {Math.Round((proc.ExitTime - proc.StartTime).TotalMilliseconds)}ms");
+            Console.WriteLine($"Start time: {proc.StartTime}\n" + $"Exit time: {proc.ExitTime}\n" 
+                            + $"Proc ID: {proc.Id}\n" + $"Exit code: {(ExitCode)proc.ExitCode}\n"
+                            + $"Elapsed time: {proc.ExitTime.Millisecond - proc.StartTime.Millisecond}ms");
 
             exitEventHandled.TrySetResult(true);
         }
