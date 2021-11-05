@@ -9,14 +9,14 @@ namespace AmeisenBotX.Bootstrap
     public class Launcher
     {
         private static Process curProcess = new();
-        private static TaskCompletionSource<bool> exitEventHandled = new();
-        private static TaskCompletionSource<bool> unhandledExceptionEventHandled = new();
-        private static TaskCompletionSource<bool> outputEventHandled = new();
-        private static TaskCompletionSource<bool> errorEventHandled = new();
+        private static string ExePath;
+        private static string Args;
+        private static string WorkDir;
 
-        private static string _exePath;
-        private readonly string _cmdArgs;
-        private readonly string _workDirPath;
+        private static readonly TaskCompletionSource<bool> unhandledExceptionEventHandled = new();
+        private static readonly TaskCompletionSource<bool> exitEventHandled = new();
+        private static readonly TaskCompletionSource<bool> outputEventHandled = new();
+        private static readonly TaskCompletionSource<bool> errorEventHandled = new();
 
         public static bool Finished { get; private set; }
         public readonly List<string> NormalOutput;
@@ -24,17 +24,17 @@ namespace AmeisenBotX.Bootstrap
 
         public Launcher(string exePath, string cmdArgs)
         {
-            _exePath = exePath;
-            _cmdArgs = cmdArgs;
+            ExePath = exePath;
+            Args = cmdArgs;
             NormalOutput = new List<string>();
             ErrorOutput = new List<string>();
         }
 
         public Launcher(string exePath, string cmdArgs, string workDirPath)
         {
-            _exePath = exePath;
-            _cmdArgs = cmdArgs;
-            _workDirPath = workDirPath;
+            ExePath = exePath;
+            Args = cmdArgs;
+            WorkDir = workDirPath;
             NormalOutput = new List<string>();
             ErrorOutput = new List<string>();
         }
@@ -43,23 +43,23 @@ namespace AmeisenBotX.Bootstrap
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
 
-            if (string.IsNullOrEmpty(_exePath))
-                throw new InvalidOperationException("Path to exe null or empty!");
+            if (string.IsNullOrEmpty(ExePath))
+                throw new ArgumentException("Path to exe null or empty!");
 
-            var workDirPath = _workDirPath;
+            var workDirPath = WorkDir;
             if (string.IsNullOrEmpty(workDirPath))
             {
                 workDirPath = Path.GetDirectoryName(workDirPath);
                 if (string.IsNullOrEmpty(workDirPath))
-                    throw new InvalidOperationException("Failed to obtain path to working directory!");
+                    throw new Exception("Failed to obtain path to working directory!");
             }
 
             var process = new Process
             {
                 StartInfo =
                 {
-                    FileName = _exePath,
-                    Arguments = _cmdArgs,
+                    FileName = ExePath,
+                    Arguments = Args,
                     WorkingDirectory = workDirPath,
                     CreateNoWindow = true,
                     ErrorDialog = false,
@@ -93,8 +93,8 @@ namespace AmeisenBotX.Bootstrap
                 }
 
                 Console.WriteLine(curProcess.Responding 
-                    ? $"{curProcess.ProcessName}({curProcess.Id}) Status = Responding"
-                    : $"{curProcess.ProcessName}({curProcess.Id}) Status = Not Responding");
+                    ? $"{curProcess.ProcessName}({curProcess.Id}) Status: Responding"
+                    : $"{curProcess.ProcessName}({curProcess.Id}) Status: Not Responding");
             }
             catch (Exception ex)
             {
@@ -104,10 +104,10 @@ namespace AmeisenBotX.Bootstrap
 
         private static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs args)
         {
-            var e = (Exception)args.ExceptionObject;
+            var exception = (Exception)args.ExceptionObject;
 
-            Console.WriteLine("MyHandler caught : " + e.Message);
-            Console.WriteLine("Runtime terminating: {0}", args.IsTerminating);
+            Console.WriteLine($"UnhandledException caught: {exception.Message}");
+            Console.WriteLine($"Runtime terminating: {args.IsTerminating}");
 
             unhandledExceptionEventHandled.TrySetResult(true);
         }
@@ -120,12 +120,12 @@ namespace AmeisenBotX.Bootstrap
 
         private static void ExitedHandler(object sendingProcess, EventArgs e)
         {
-            var proc = (Process)sendingProcess;
             Finished = true;
+            var proc = (Process)sendingProcess;
 
             Console.WriteLine($"Start time: {proc.StartTime}\n" + $"Exit time: {proc.ExitTime}\n" 
-                            + $"Proc ID: {proc.Id}\n" + $"Exit code: {(ExitCode)proc.ExitCode}\n"
-                            + $"Elapsed time: {proc.ExitTime.Millisecond - proc.StartTime.Millisecond}ms");
+                            + $"Run time: {proc.ExitTime.Millisecond - proc.StartTime.Millisecond}ms"
+                            + $"Proc Id: {proc.Id}\n" + $"Exit code: {(proc.ExitCode == 0 ? ExitCode.NormalTermination : ExitCode.AbnormalTermination)}\n");
 
             exitEventHandled.TrySetResult(true);
         }
