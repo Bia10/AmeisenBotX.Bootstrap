@@ -11,78 +11,32 @@ namespace AmeisenBotX.Bootstrap
         {
             const string trinityBuildPath = "C:\\Build\\bin\\RelWithDebInfo";
             const string mmapsPath = "C:\\Games\\World of Warcraft 3.3.5a\\mmaps";
-            
-            LaunchAuthServer(trinityBuildPath);
-            LaunchWorldServer(trinityBuildPath);
-            LaunchAmeisenBotNavServer(mmapsPath);
+
+            LaunchServer("authserver", trinityBuildPath);
+            LaunchServer("worldserver", trinityBuildPath);
+            LaunchServer("AmeisenNavigationServer", mmapsPath);
         }
 
-        private static void LaunchAuthServer(string trinityBuildPath)
+        private static void LaunchServer(string exeName, string pathToWorkDir)
         {
-            ProcessExists("authserver", true);
+            ProcessExists(exeName, true);
 
-            var authServerPath = trinityBuildPath + "\\authserver.exe";
-            if (File.Exists(authServerPath))
+            var serverFilePath = pathToWorkDir + $"\\{exeName}.exe";
+            if (File.Exists(serverFilePath))
             {
-                Console.WriteLine("Launching auth server ...");
+                Console.WriteLine("Launching" + $" {exeName}" + " ...");
 
-                var authLauncher = new Launcher(authServerPath, string.Empty, trinityBuildPath);
-                authLauncher.Launch();
+                var serverLauncher = new Launcher(serverFilePath, string.Empty, pathToWorkDir);
+                serverLauncher.Launch();
 
-                if (authLauncher.ErrorOutput.Any())
-                    throw new Exception("Errors occurred during launch of authserver.exe!");
+                if (serverLauncher.ErrorOutput.Any())
+                    throw new Exception("Errors occurred during launch of" + $" {exeName}.exe!");
 
-                Console.WriteLine("Auth server ready!");
+                Console.WriteLine($"{exeName}" + " ready!");
             }
             else
             {
-                throw new FileNotFoundException($"Failed to find authserver.exe! at path: {authServerPath}");
-            }
-        }
-
-        private static void LaunchWorldServer(string trinityBuildPath)
-        {
-            ProcessExists("worldserver", true);
-
-            var worldServerPath = trinityBuildPath + "\\worldserver.exe";
-            if (File.Exists(worldServerPath))
-            {
-                Console.WriteLine("Launching world server ...");
-
-                var worldLauncher = new Launcher(worldServerPath, string.Empty, trinityBuildPath);
-                worldLauncher.Launch();
-
-                if (worldLauncher.ErrorOutput.Any())
-                    throw new Exception("Errors occurred during launch of authserver.exe!");
-
-                Console.WriteLine("World server ready!");
-            }
-            else
-            {
-                throw new FileNotFoundException($"Failed to find worldserver.exe! at path: {worldServerPath}");
-            }
-        }
-
-        private static void LaunchAmeisenBotNavServer(string mmapsPath)
-        { 
-            ProcessExists("AmeisenNavigationServer", true);
-
-            var navServerPath = mmapsPath + "\\AmeisenNavigationServer.exe";
-            if (File.Exists(navServerPath))
-            {
-                Console.WriteLine("Launching nav server ...");
-
-                var navLauncher = new Launcher(navServerPath, string.Empty, mmapsPath);
-                navLauncher.Launch();
-
-                if (navLauncher.ErrorOutput.Any())
-                    throw new Exception("Errors occurred during launch of AmeisenNavigationServer.exe!");
-
-                Console.WriteLine("Nav server ready!");
-            }
-            else
-            {
-                throw new FileNotFoundException($"Failed to find AmeisenNavigationServer.exe! at path: {navServerPath}");
+                throw new FileNotFoundException("Failed to find" + $" {exeName}.exe!" + $" at path: {serverFilePath}");
             }
         }
 
